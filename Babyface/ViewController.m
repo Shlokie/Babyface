@@ -13,6 +13,7 @@
 @interface ViewController () {
     MMWormhole *_wormhole;
     MPMoviePlayerController *_moviePlayer;
+    NSTimer *_timer;
 }
 
 @end
@@ -40,15 +41,29 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
+
+
     UIImage *image = [UIImage imageNamed:@"baby-red"];
     NSData *imageData = UIImagePNGRepresentation(image);
     
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [_wormhole passMessageObject:imageData identifier:@"UpdateImage"];
+        [_timer invalidate];
+        _timer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(timerFireMethod:) userInfo:nil repeats:YES];
     });
     
     
+    
+    
+}
+
+- (void)timerFireMethod:(NSTimer *)timer {
+    UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [_moviePlayer.view.layer renderInContext:context];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
     
     
 }
